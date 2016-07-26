@@ -9,85 +9,99 @@
 import UIKit
 import CoreImage
 import CoreGraphics
+import ImageIO
 
 class SpecialEffectViewController: UIViewController {
   
-    let aUIImage = UIImage(named: "colorful.png")!
-    let aUIImageBackground = UIImage(named: "starrynight.jpg")!
-    let  aUIImageBackgroundLight = UIImage(named: "graydis.png")!
+    let aUIImage = UIImage(named: "golden gate.png")!
+    var aUIImageBackground = UIImage(named: "starrynight.jpg")!
+    let aUIImageBackgroundLight = UIImage(named: "graydis.png")!
     let context = CIContext(options: nil)
-    var displayedImage: UIImage?
+    var imageToEdit: UIImage?
+    var aCIImage: CIImage?
+    var specialEffect: CIFilter?
+    var outputCIImage: CIImage?
+    var aCGImage: CGImage?
+    var outputUIImage: UIImage?
+    var aUIImageBackgroundNew: UIImage?
+    var aCIImageBackground: CIImage?
 
     @IBOutlet weak var imageView: UIImageView!
     
     
     @IBAction func TappedReset(sender: AnyObject) {
-        imageView.image = UIImage(named: "colorful.png")!
+        imageToEdit = aUIImage
+        imageView.image = imageToEdit
     }
 
-    @IBAction func TappedHold(sender: AnyObject) {
-        displayedImage = imageView.image
+    @IBAction func TappedSaveButton(sender: AnyObject) {
+        imageToEdit = ResizeImage(imageView.image!, targetSize: CGSize(width: 9616, height: 2313))
+        print("\(CIImage(image: aUIImage)!.properties)")
+        UIImageWriteToSavedPhotosAlbum(imageToEdit!, nil, nil, nil)
     }
     
+    @IBAction func TappedHold(sender: AnyObject) {
+        imageToEdit = imageView.image
+    }
     
+    func transformImage() {
+        aCIImage = CIImage(image: imageToEdit!)
+        specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
+    }
+    func transformImageAndBackgroud() {
+        aCIImage = CIImage(image: imageToEdit!)
+        specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
+        aUIImageBackgroundNew = ResizeImage(aUIImageBackground, targetSize: imageToEdit!.size)
+        aCIImageBackground = CIImage(image: aUIImageBackgroundNew!)
+        specialEffect!.setValue(aCIImageBackground, forKey: kCIInputBackgroundImageKey)
+    }
+    
+    func produceImage()  {
+        outputCIImage = specialEffect!.outputImage
+        aCGImage = context.createCGImage(outputCIImage!, fromRect: outputCIImage!.extent)
+        outputUIImage = UIImage(CGImage: aCGImage!)
+        imageView.image = outputUIImage
+    }
     
     
     @IBAction func TappedZoomBlur(sender: AnyObject) {
 //        inputCenter Default value: [150 150]
 //        inputAmount Default value: 20.00
         
-        let specialEffect = CIFilter(name: "CIZoomBlur")
-        let aCIImage = CIImage(image: aUIImage)
-        specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
-        let outputImage = specialEffect?.outputImage
-        let cgimg = context.createCGImage(outputImage!, fromRect: outputImage!.extent)
-        let newUIImage = UIImage(CGImage: cgimg)
-        imageView.image = newUIImage
+        specialEffect = CIFilter(name: "CIZoomBlur")
+        transformImage()
+        produceImage()
     }
+    
     @IBAction func TappedMotionBlur(sender: AnyObject) {
 //        inputRadius Default value: 20.00
 //        inputAngle Default value: 0.00
-        let specialEffect = CIFilter(name: "CIMotionBlur")
-        let aCIImage = CIImage(image: aUIImage)
-        specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
-        let outputImage = specialEffect?.outputImage
-        let cgimg = context.createCGImage(outputImage!, fromRect: outputImage!.extent)
-        let newUIImage = UIImage(CGImage: cgimg)
-        imageView.image = newUIImage
-
+        specialEffect = CIFilter(name: "CIMotionBlur")
+        transformImage()
+        produceImage()
     }
-    @IBAction func TappedLineOverlayButton(sender: AnyObject) {
-        let specialEffect = CIFilter(name: "CILineOverlay")
-        let aCIImage = CIImage(image: aUIImage)
-        specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
-        let outputImage = specialEffect?.outputImage
-        let cgimg = context.createCGImage(outputImage!, fromRect: outputImage!.extent)
-        let newUIImage = UIImage(CGImage: cgimg)
-        imageView.image = newUIImage
     
+    @IBAction func TappedLineOverlayButton(sender: AnyObject) {
+        specialEffect = CIFilter(name: "CILineOverlay")
+        transformImage()
+        produceImage()
     }
     
     @IBAction func TappedColorClamp(sender: AnyObject) {
 //        inputMinComponents Default value: [0 0 0 0] Identity: [0 0 0 0]
 //        inputMaxComponents Default value: [1 1 1 1] Identity: [1 1 1 1]
         
-        let specialEffect = CIFilter(name: "CIColorClamp")
-        let aCIImage = CIImage(image: aUIImage)
-        specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
+        specialEffect = CIFilter(name: "CIColorClamp")
+        transformImage()
         specialEffect!.setValue(CIVector(x: 0.4, y: 0, z: 0.4, w: 0), forKey: "inputMinComponents")
         specialEffect!.setValue(CIVector(x: 0.8, y: 1, z: 0.8, w: 1), forKey: "inputMaxComponents")
-        let outputImage = specialEffect?.outputImage
-        let cgimg = context.createCGImage(outputImage!, fromRect: outputImage!.extent)
-        let newUIImage = UIImage(CGImage: cgimg)
-        imageView.image = newUIImage
+        produceImage()
     }
     
     
-    
     @IBAction func TappedColorPolynomial(sender: AnyObject) {
-        let specialEffect = CIFilter(name: "CIColorPolynomial")
-        let aCIImage = CIImage(image: aUIImage)
-        specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
+        specialEffect = CIFilter(name: "CIColorPolynomial")
+        transformImage()
         let r: [CGFloat] = [0.0, 0.0, 0.0, 0.4]
         let g: [CGFloat] = [0.0, 0.0, 0.5, 0.8]
         let b: [CGFloat] = [0.0, 0.0, 0.5, 0.1]
@@ -98,24 +112,17 @@ class SpecialEffectViewController: UIViewController {
         specialEffect!.setValue(CIVector(values: b, count: b.count), forKey: "inputBlueCoefficients")
         specialEffect!.setValue(CIVector(values: a, count: a.count), forKey: "inputAlphaCoefficients")
         
-        let outputImage = specialEffect?.outputImage
-        let cgimg = context.createCGImage(outputImage!, fromRect: outputImage!.extent)
-        let newUIImage = UIImage(CGImage: cgimg)
-        imageView.image = newUIImage
+        produceImage()
     }
     
     
     @IBAction func TappedHueAdjust(sender: AnyObject) {
 //        inputAngle Default value: 0.00
         
-        let specialEffect = CIFilter(name: "CIHueAdjust")
-        let aCIImage = CIImage(image: aUIImage)
-        specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
+        specialEffect = CIFilter(name: "CIHueAdjust")
+        transformImage()
         specialEffect!.setValue(0.8, forKey: "inputAngle")
-        let outputImage = specialEffect?.outputImage
-        let cgimg = context.createCGImage(outputImage!, fromRect: outputImage!.extent)
-        let newUIImage = UIImage(CGImage: cgimg)
-        imageView.image = newUIImage
+        produceImage()
     }
     
     
@@ -123,15 +130,11 @@ class SpecialEffectViewController: UIViewController {
 //        inputNeutral Default value: [6500, 0]
 //        inputTargetNeutral Default value: [6500, 0]
         
-        let specialEffect = CIFilter(name: "CITemperatureAndTint")
-        let aCIImage = CIImage(image: aUIImage)
-        specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
+        specialEffect = CIFilter(name: "CITemperatureAndTint")
+        transformImage()
         specialEffect!.setValue(CIVector(x: 6500, y: 500), forKey: "inputNeutral")
         specialEffect!.setValue(CIVector(x: 1000, y: 630), forKey: "inputTargetNeutral")
-        let outputImage = specialEffect?.outputImage
-        let cgimg = context.createCGImage(outputImage!, fromRect: outputImage!.extent)
-        let newUIImage = UIImage(CGImage: cgimg)
-        imageView.image = newUIImage
+        produceImage()
     }
     
     
@@ -144,40 +147,30 @@ class SpecialEffectViewController: UIViewController {
 //        inputPoint3 Default value: [0.75, 0.75]
 //        inputPoint4 Default value: [1, 1]
         
-        let specialEffect = CIFilter(name: "CIToneCurve")
-        let aCIImage = CIImage(image: aUIImage)
-        specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
+        specialEffect = CIFilter(name: "CIToneCurve")
+        transformImage()
         specialEffect!.setValue(CIVector(x: 0.0, y: 0.0), forKey: "inputPoint0")
         specialEffect!.setValue(CIVector(x: 0.27, y: 0.26), forKey: "inputPoint1")
         specialEffect!.setValue(CIVector(x: 0.5, y: 0.8), forKey: "inputPoint2")
         specialEffect!.setValue(CIVector(x: 0.7, y: 9.0), forKey: "inputPoint3")
         specialEffect!.setValue(CIVector(x: 1.0, y: 1.0), forKey: "inputPoint4")
-        let outputImage = specialEffect?.outputImage
-        let cgimg = context.createCGImage(outputImage!, fromRect: outputImage!.extent)
-        let newUIImage = UIImage(CGImage: cgimg)
-        imageView.image = newUIImage
+        produceImage()
     }
     
     @IBAction func TappedVibrance(sender: AnyObject) {
         
-        let specialEffect = CIFilter(name: "CIVibrance")
-        let aCIImage = CIImage(image: aUIImage)
-        specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
+        specialEffect = CIFilter(name: "CIVibrance")
+        transformImage()
         specialEffect!.setValue(0.9, forKey: "inputAmount")
-        let outputImage = specialEffect?.outputImage
-        let cgimg = context.createCGImage(outputImage!, fromRect: outputImage!.extent)
-        let newUIImage = UIImage(CGImage: cgimg)
-        imageView.image = newUIImage
+        produceImage()
     }
     
     @IBAction func TappedColorCrossPolynomial(sender: AnyObject) {
         //    inputRedCoefficientsDefault value: [1 0 0 0 0 0 0 0 0 0] Identity: [1 0 0 0 0 0 0 0 0 0]
         //    inputGreenCoefficients Default value: [0 1 0 0 0 0 0 0 0 0] Identity: [0 1 0 0 0 0 0 0 0 0]
         //    inputBlueCoefficients Default value: [0 0 1 0 0 0 0 0 0 0] Identity: [0 0 1 0 0 0 0 0 0 0]
-        let specialEffect = CIFilter(name: "CIColorCrossPolynomial")
-        let aCIImage = CIImage(image: aUIImage)
-        specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
-        
+        specialEffect = CIFilter(name: "CIColorCrossPolynomial")
+        transformImage()
         let r: [CGFloat] = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         let g: [CGFloat] = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         let b: [CGFloat] = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -185,11 +178,7 @@ class SpecialEffectViewController: UIViewController {
         specialEffect!.setValue(CIVector(values: r, count: r.count), forKey: "inputRedCoefficients")
         specialEffect!.setValue(CIVector(values: g, count: g.count), forKey: "inputGreenCoefficients")
         specialEffect!.setValue(CIVector(values: b, count: b.count), forKey: "inputBlueCoefficients")
-
-        let outputImage = specialEffect?.outputImage
-        let cgimg = context.createCGImage(outputImage!, fromRect: outputImage!.extent)
-        let newUIImage = UIImage(CGImage: cgimg)
-        imageView.image = newUIImage
+        produceImage()
     }
     
 
@@ -197,72 +186,39 @@ class SpecialEffectViewController: UIViewController {
     
     
     @IBAction func TappedPhotoEffectChrome(sender: AnyObject) {
-        let specialEffect = CIFilter(name: "CIPhotoEffectChrome")
-        let aCIImage = CIImage(image: aUIImage)
-        specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
-        let outputImage = specialEffect?.outputImage
-        let cgimg = context.createCGImage(outputImage!, fromRect: outputImage!.extent)
-        let newUIImage = UIImage(CGImage: cgimg)
-        imageView.image = newUIImage
+        specialEffect = CIFilter(name: "CIPhotoEffectChrome")
+        transformImage()
+        produceImage()
     }
     
     
     
     @IBAction func TappedDifferenceBlendMode(sender: AnyObject) {
-        let specialEffect = CIFilter(name: "CIDifferenceBlendMode")
-        let aUIImageBackgroundNew = self.ResizeImage(aUIImageBackground, targetSize: aUIImage.size)
-        let aCIImage = CIImage(image: aUIImage)
-        let aCIImageBackground = CIImage(image: aUIImageBackgroundNew)
-        specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
-        specialEffect!.setValue(aCIImageBackground, forKey: kCIInputBackgroundImageKey)
-        let outputImage = specialEffect?.outputImage
-        let cgimg = context.createCGImage(outputImage!, fromRect: outputImage!.extent)
-        let newUIImage = UIImage(CGImage: cgimg)
-        imageView.image = newUIImage
+        specialEffect = CIFilter(name: "CIDifferenceBlendMode")
+        transformImageAndBackgroud()
+        produceImage()
     }
     
     @IBAction func TappedHardLightBlendMode(sender: AnyObject) {
-            let specialEffect = CIFilter(name: "CIHardLightBlendMode")
-            let aUIImageBackgroundNew = self.ResizeImage(aUIImageBackground, targetSize: aUIImage.size)
-            let aCIImage = CIImage(image: aUIImage)
-            let aCIImageBackground = CIImage(image: aUIImageBackgroundNew)
-            specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
-            specialEffect!.setValue(aCIImageBackground, forKey: kCIInputBackgroundImageKey)
-            let outputImage = specialEffect?.outputImage
-            let cgimg = context.createCGImage(outputImage!, fromRect: outputImage!.extent)
-            let newUIImage = UIImage(CGImage: cgimg)
-            imageView.image = newUIImage
+        specialEffect = CIFilter(name: "CIHardLightBlendMode")
+        transformImageAndBackgroud()
+        produceImage()
     }
     
     @IBAction func TappedLuminosityBlend(sender: AnyObject) {
-        let specialEffect = CIFilter(name: "CILuminosityBlendMode")
-        let aUIImageBackgroundNew = self.ResizeImage(aUIImageBackgroundLight, targetSize: aUIImage.size)
-        let aCIImage = CIImage(image: aUIImage)
-        let aCIImageBackground = CIImage(image: aUIImageBackgroundNew)
-        specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
-        specialEffect!.setValue(aCIImageBackground, forKey: kCIInputBackgroundImageKey)
-        let outputImage = specialEffect?.outputImage
-        let cgimg = context.createCGImage(outputImage!, fromRect: outputImage!.extent)
-        let newUIImage = UIImage(CGImage: cgimg)
-        imageView.image = newUIImage
-
+        specialEffect = CIFilter(name: "CILuminosityBlendMode")
+        transformImageAndBackgroud()
+        produceImage()
     }
 
     
     
 
     @IBAction func TappedDisplacementDistortion(sender: AnyObject) {
-        let specialEffect = CIFilter(name: "CIDisplacementDistortion")
-        let aUIImageBackgroundNew = self.ResizeImage(aUIImageBackgroundLight, targetSize: aUIImage.size)
-        let aCIImage = CIImage(image: aUIImage)
-        let aCIImageBackground = CIImage(image: aUIImageBackgroundNew)
-        specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
-        specialEffect!.setValue(aCIImageBackground, forKey: kCIInputBackgroundImageKey)
+        specialEffect = CIFilter(name: "CIDisplacementDistortion")
+        transformImageAndBackgroud()
         specialEffect!.setValue(30.0, forKey: "inputScale")
-        let outputImage = specialEffect?.outputImage
-        let cgimg = context.createCGImage(outputImage!, fromRect: outputImage!.extent)
-        let newUIImage = UIImage(CGImage: cgimg)
-        imageView.image = newUIImage
+        produceImage()
     }
     
     
@@ -270,17 +226,10 @@ class SpecialEffectViewController: UIViewController {
     @IBAction func TappedSharpenLuminance(sender: AnyObject) {
 //        inputSharpness Default value: 0.40
         
-        let specialEffect = CIFilter(name: "CISharpenLuminance")
-        
-        let aCIImage = CIImage(image: aUIImage)
-        
-        specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
-        
+        specialEffect = CIFilter(name: "CISharpenLuminance")
+        transformImage()
         specialEffect!.setValue(0.8, forKey: "inputSharpness")
-        let outputImage = specialEffect?.outputImage
-        let cgimg = context.createCGImage(outputImage!, fromRect: outputImage!.extent)
-        let newUIImage = UIImage(CGImage: cgimg)
-        imageView.image = newUIImage
+        produceImage()
     }
 
     
@@ -289,30 +238,20 @@ class SpecialEffectViewController: UIViewController {
 //        inputRadius Default value: 10.00
 //        inputIntensity Default value: 0.5
         
-        let specialEffect = CIFilter(name: "CIBloom")
-        let aCIImage = CIImage(image: aUIImage)
-        specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
-        
+        specialEffect = CIFilter(name: "CIBloom")
+        transformImage()
         specialEffect!.setValue(1.5, forKey: "inputIntensity")
         specialEffect!.setValue(aUIImage.size.width / 200, forKey: "inputRadius")
-        let outputImage = specialEffect?.outputImage
-        let cgimg = context.createCGImage(outputImage!, fromRect: outputImage!.extent)
-        let newUIImage = UIImage(CGImage: cgimg)
-        imageView.image = newUIImage
+        produceImage()
     }
     
     
     
     @IBAction func TappedCIEdges(sender: AnyObject) {
-        let specialEffect = CIFilter(name: "CIEdges")
-        let aCIImage = CIImage(image: aUIImage)
-        specialEffect!.setValue(aCIImage, forKey: kCIInputImageKey)
-        
+        specialEffect = CIFilter(name: "CIEdges")
+        transformImage()
         specialEffect!.setValue(1.5, forKey: "inputIntensity")
-        let outputImage = specialEffect?.outputImage
-        let cgimg = context.createCGImage(outputImage!, fromRect: outputImage!.extent)
-        let newUIImage = UIImage(CGImage: cgimg)
-        imageView.image = newUIImage
+        produceImage()
     }
     
     func ResizeImage(image: UIImage, targetSize: CGSize) -> UIImage {
@@ -344,7 +283,7 @@ class SpecialEffectViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        imageToEdit = aUIImage
         // Do any additional setup after loading the view.
     }
 

@@ -217,7 +217,7 @@
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eFY-vY-RSw">
                                 <rect key="frame" x="20" y="20" width="560" height="362"/>
                                 <subviews>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="colorful.png" translatesAutoresizingMaskIntoConstraints="NO" id="nOy-hn-tiL">
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="golden gate.png" translatesAutoresizingMaskIntoConstraints="NO" id="nOy-hn-tiL">
                                         <rect key="frame" x="0.0" y="0.0" width="560" height="362"/>
                                     </imageView>
                                 </subviews>
@@ -374,6 +374,13 @@
                                     <action selector="TappedHold:" destination="qzS-8U-spA" eventType="touchUpInside" id="HKJ-C0-QtD"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FuE-pD-u5p">
+                                <rect key="frame" x="221" y="383" width="32" height="30"/>
+                                <state key="normal" title="save"/>
+                                <connections>
+                                    <action selector="TappedSaveButton:" destination="qzS-8U-spA" eventType="touchUpInside" id="Ic3-nX-6cB"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -382,12 +389,14 @@
                             <constraint firstItem="zKd-Ue-o4z" firstAttribute="top" secondItem="mUu-bz-0Lm" secondAttribute="bottom" constant="37" id="5sk-qU-Hoa"/>
                             <constraint firstItem="3on-da-nyp" firstAttribute="leading" secondItem="pJQ-Qf-dfy" secondAttribute="leading" id="7Jy-41-nQ8"/>
                             <constraint firstItem="eFY-vY-RSw" firstAttribute="leading" secondItem="P6E-4Z-Tc6" secondAttribute="leadingMargin" id="8be-r4-gl9"/>
+                            <constraint firstItem="FuE-pD-u5p" firstAttribute="baseline" secondItem="dpZ-Gs-1dv" secondAttribute="baseline" id="9D7-vM-4RY"/>
                             <constraint firstItem="CQh-fp-loF" firstAttribute="leading" secondItem="fzs-ed-mlr" secondAttribute="leading" id="9PL-NJ-Men"/>
                             <constraint firstItem="bON-jU-6dx" firstAttribute="leading" secondItem="90z-dD-FLb" secondAttribute="leading" id="CAN-Pr-LUH"/>
                             <constraint firstItem="ilK-wS-n3m" firstAttribute="baseline" secondItem="dpZ-Gs-1dv" secondAttribute="baseline" id="DJR-LN-Eka"/>
                             <constraint firstItem="pJQ-Qf-dfy" firstAttribute="leading" secondItem="P6E-4Z-Tc6" secondAttribute="leadingMargin" constant="7" id="F1q-gX-44v"/>
                             <constraint firstItem="KTk-QL-Pqx" firstAttribute="leading" secondItem="PQZ-Ac-4SM" secondAttribute="leading" id="Hgk-6B-GBZ"/>
                             <constraint firstItem="BJY-pl-ucZ" firstAttribute="baseline" secondItem="bON-jU-6dx" secondAttribute="baseline" id="Iq0-Ux-aIb"/>
+                            <constraint firstItem="dpZ-Gs-1dv" firstAttribute="leading" secondItem="FuE-pD-u5p" secondAttribute="trailing" constant="28" id="JHx-Po-Y1y"/>
                             <constraint firstItem="fzs-ed-mlr" firstAttribute="leading" secondItem="mUu-bz-0Lm" secondAttribute="leading" id="KZ2-f2-Y3n"/>
                             <constraint firstItem="KTk-QL-Pqx" firstAttribute="top" secondItem="PQZ-Ac-4SM" secondAttribute="bottom" constant="1" id="MYJ-yw-Sc7"/>
                             <constraint firstItem="AnA-vb-SSY" firstAttribute="baseline" secondItem="Urg-nf-cXN" secondAttribute="baseline" id="NoW-bT-2Hq"/>
@@ -433,7 +442,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="colorful.png" width="604" height="601"/>
         <image name="golden gate.png" width="1500" height="500"/>
     </resources>
 </document>
